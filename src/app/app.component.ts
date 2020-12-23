@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import * as ex from 'excalibur';
-import { Engine } from 'excalibur';
+import { Game } from 'src/game/game';
 
 @Component({
     selector: 'app-root',
@@ -8,16 +7,10 @@ import { Engine } from 'excalibur';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-    engine: Engine;
+    game: Game;
 
     ngOnInit(): void {
-        this.engine = new ex.Engine({
-            canvasElementId: 'game',
-            width: 800,
-            height: 800
-        });
-
-        this.engine.start();
+        this.game = new Game();
     }
 
 }
