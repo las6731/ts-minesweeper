@@ -1,13 +1,13 @@
 import { Actor, Color, Vector } from 'excalibur';
 
 export class Cell extends Actor {
-    static size = 50;
+    static size = 32;
 
     gridPos: Vector;
     private mine: boolean;
     neighbors: number;
     private flagged: boolean;
-    private revealed: boolean;
+    revealed: boolean;
 
     constructor(pos: Vector, mine: boolean) {
         super(pos.x * Cell.size + Cell.size / 2, pos.y * Cell.size + Cell.size / 2, Cell.size, Cell.size, Color.Gray);
@@ -17,9 +17,6 @@ export class Cell extends Actor {
         this.neighbors = 0;
         this.flagged = false;
         this.revealed = false;
-
-        // debug
-        this.reveal();
     }
 
     get isMine(): boolean { return this.mine; }
@@ -29,16 +26,21 @@ export class Cell extends Actor {
      * @returns whether the cell was a mine.
      */
     reveal(): boolean {
-        this.revealed = true;
-        this.color = Color.LightGray;
-        return this.isMine;
+        if (!this.flagged) {
+            this.revealed = true;
+            this.color = Color.LightGray;
+            return this.isMine;
+        }
+        return false;
     }
 
     /**
      * Toggle whether the cell is flagged.
      */
     toggleFlag(): void {
-        this.flagged = !this.flagged;
+        if (!this.revealed) {
+            this.flagged = !this.flagged;
+        }
     }
 
     public onPostDraw(ctx: CanvasRenderingContext2D, delta: number): void {

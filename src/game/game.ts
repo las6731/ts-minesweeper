@@ -13,7 +13,7 @@ export class Game extends Engine {
     }
 
     public start(): any {
-        this.add('minesweeper', new Minesweeper(this, new Vector(16, 16), 50));
+        this.add('minesweeper', new Minesweeper(this, new Vector(25, 25), 100));
 
         return super.start().then(() => {
             this.goToScene('minesweeper');
