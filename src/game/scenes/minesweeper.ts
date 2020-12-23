@@ -1,4 +1,3 @@
-import { randomInt } from 'crypto';
 import { Engine, Scene, Vector } from 'excalibur';
 import { Cell } from '../models/cell';
 
@@ -21,7 +20,26 @@ export class Minesweeper extends Scene {
         this.numMines = 0;
         this.totalMines = mines;
 
+        this.gameGrid = [];
+        for (let x = 0; x < size.x; x++) {
+            this.gameGrid[x] = [];
+            const row = this.gameGrid[x];
+            for (let y = 0; y < size.y; y++) {
+                row[y] = null;
+            }
+        }
+
+
         this.populateGrid();
+        this.populateNeighbors();
+    }
+
+    /**
+     * Return a random integer between 0 (inclusive) and the ceiling (non-inclusive).
+     * @param ceiling max number (non-inclusive).
+     */
+    private randomInt(ceiling: number): number {
+        return Math.floor(Math.random() * Math.floor(ceiling));
     }
 
     /**
@@ -30,8 +48,8 @@ export class Minesweeper extends Scene {
     private populateGrid(): void {
         // place mines
         while (this.numMines < this.totalMines) {
-            const x = randomInt(this.size.x);
-            const y = randomInt(this.size.y);
+            const x = this.randomInt(this.size.x);
+            const y = this.randomInt(this.size.y);
 
             // if there's already a mine there, do nothing
             if (this.gameGrid[x][y]) {
@@ -40,6 +58,7 @@ export class Minesweeper extends Scene {
 
             this.gameGrid[x][y] = new Cell(new Vector(x, y), true);
             this.numMines++;
+            console.log(`Mine placed! ${this.numMines}/${this.totalMines}`, x, y);
         }
 
         // fill in the rest of the grid
@@ -47,7 +66,9 @@ export class Minesweeper extends Scene {
             for (let y = 0; y < this.size.y; y++) {
                 if (!this.gameGrid[x][y]) { // no mine has been placed yet
                     this.gameGrid[x][y] = new Cell(new Vector(x, y), false);
+                    console.log('Blank cell placed!', x, y);
                 }
+                this.add(this.gameGrid[x][y]); // add cell to scene
             }
         }
     }
@@ -59,8 +80,8 @@ export class Minesweeper extends Scene {
     private calculateNeighbors(pos: Vector): number {
         let neighbors = 0;
 
-        for (let x = Math.max(0, pos.x - 1); x < Math.min(this.size.x, pos.x + 1); x++) {
-            for (let y = Math.max(0, pos.y - 1); y < Math.min(this.size.y, pos.y + 1); y++) {
+        for (let x = Math.max(0, pos.x - 1); x < Math.min(this.size.x, pos.x + 2); x++) {
+            for (let y = Math.max(0, pos.y - 1); y < Math.min(this.size.y, pos.y + 2); y++) {
                 if (this.gameGrid[x][y].isMine) {
                     neighbors++;
                 }

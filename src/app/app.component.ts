@@ -11,6 +11,7 @@ export class AppComponent implements OnInit {
 
     ngOnInit(): void {
         this.game = new Game();
+        this.game.start();
     }
 
 }
