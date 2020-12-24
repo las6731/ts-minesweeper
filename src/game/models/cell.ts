@@ -1,4 +1,4 @@
-import { Actor, Color, Vector } from 'excalibur';
+import { Actor, CollisionType, Color, Engine, Vector } from 'excalibur';
 
 export class Cell extends Actor {
     static size = 32;
@@ -17,6 +17,7 @@ export class Cell extends Actor {
         this.neighbors = 0;
         this.flagged = false;
         this.revealed = false;
+        this.body.collider.type = CollisionType.PreventCollision;
     }
 
     get isMine(): boolean { return this.mine; }
@@ -62,6 +63,7 @@ export class Cell extends Actor {
 
             ctx.fillText(text, 0, 0, Cell.size);
         } else if (this.flagged) {
+            console.log('Delta', delta);
             ctx.fillText('F', 0, 0, Cell.size);
         }
     }
