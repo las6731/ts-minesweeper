@@ -10,6 +10,7 @@ export class Minesweeper extends Scene {
     totalMines: number;
     gameGrid: Cell[][];
     started: boolean;
+    lost: boolean;
 
     /**
      * Initialize the Minesweeper game.
@@ -22,19 +23,9 @@ export class Minesweeper extends Scene {
 
         this.game = engine;
         this.size = size;
-        this.numMines = 0;
         this.totalMines = mines;
-        this.started = false;
 
-        this.gameGrid = [];
-        for (let x = 0; x < size.x; x++) {
-            this.gameGrid[x] = [];
-            const row = this.gameGrid[x];
-            for (let y = 0; y < size.y; y++) {
-                row[y] = new Cell(new Vector(x, y), false);
-                this.add(row[y]);
-            }
-        }
+        this.resetGame();
 
         this.revealCell = this.revealCell.bind(this);
         this.flagCell = this.flagCell.bind(this);
@@ -43,11 +34,33 @@ export class Minesweeper extends Scene {
         engine.input.keyboard.on('release', this.flagCell);
     }
 
+    resetGame(): void {
+        this.numMines = 0;
+        this.started = false;
+        this.lost = false;
+        this.actors.forEach(a => this.remove(a));
+
+        this.gameGrid = [];
+        for (let x = 0; x < this.size.x; x++) {
+            this.gameGrid[x] = [];
+            const row = this.gameGrid[x];
+            for (let y = 0; y < this.size.y; y++) {
+                row[y] = new Cell(new Vector(x, y), false);
+                this.add(row[y]);
+            }
+        }
+    }
+
     revealCell(event: PointerUpEvent): void {
+        if (this.lost) {
+            return;
+        }
+
         const pos = event.worldPos;
         const gridPos = new Vector(Math.floor(pos.x / Cell.size), Math.floor(pos.y / Cell.size));
 
         if (!this.started) {
+            this.actors.forEach(a => this.remove(a));
             this.populateGrid(gridPos);
             this.populateNeighbors();
             this.revealNeighbors(gridPos);
@@ -58,6 +71,8 @@ export class Minesweeper extends Scene {
         const cell = this.gameGrid[gridPos.x][gridPos.y];
         if (cell.reveal()) {
             console.log('You lost, loser!');
+            this.lost = true;
+            this.revealAll();
         } else if (cell.neighbors === 0) {
             this.revealNeighbors(cell.gridPos);
         }
@@ -80,12 +95,24 @@ export class Minesweeper extends Scene {
         }
     }
 
+    revealAll(): void {
+        for (let x = 0; x < this.size.x; x++) {
+            for (let y = 0; y < this.size.y; y++) {
+                this.gameGrid[x][y].reveal();
+            }
+        }
+    }
+
     flagCell(event: KeyEvent): void {
         if (event.key === 70) {
             const mousePos = this.game.input.pointers.primary.lastWorldPos;
             const gridPos = new Vector(Math.floor(mousePos.x / Cell.size), Math.floor(mousePos.y / Cell.size));
 
-            this.gameGrid[gridPos.x][gridPos.y].toggleFlag();
+            if (this.gameGrid[gridPos.x][gridPos.y].toggleFlag()) {
+                this.numMines--;
+            } else {
+                this.numMines++;
+            }
         }
     }
 

@@ -1,4 +1,9 @@
 <div style='display: flex; flex-direction: column; align-items: center; justify-content: center; width:100%; height:100%;'>
     <h1>Minesweeper or something</h1>
-    <canvas id='game'></canvas>
+    <h2>Mines: {{game.gameScene.numMines}}/{{game.gameScene.totalMines}}</h2>
+    <div *ngIf='game.gameScene.lost' style='display: flex; flex-direction: column; align-items: center; justify-content: center;'>
+        <h2>You have lost! :(</h2>
+        <input type='button' value='Play again?' (click)='game.gameScene.resetGame()'>
+    </div>
+    <canvas id='game' style='margin: 2em;'></canvas>
 </div>

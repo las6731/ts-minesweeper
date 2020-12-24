@@ -37,10 +37,11 @@ export class Cell extends Actor {
     /**
      * Toggle whether the cell is flagged.
      */
-    toggleFlag(): void {
+    toggleFlag(): boolean {
         if (!this.revealed) {
             this.flagged = !this.flagged;
         }
+        return this.flagged;
     }
 
     public onPostDraw(ctx: CanvasRenderingContext2D, delta: number): void {
